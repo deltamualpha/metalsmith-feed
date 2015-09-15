@@ -36,6 +36,7 @@ module.exports = (options={}) ->
     for file in collection
       itemData = extend {}, file,
         description: postDescription(file)
+        custom_elements: [ { 'media:image': metadata.site?.url + file.featuredImage }, { 'media:thumbnail': metadata.site?.url + file.featuredImage } ]
       if not itemData.url and itemData.path
         itemData.url = url.resolve siteUrl, file.path
       feed.item itemData

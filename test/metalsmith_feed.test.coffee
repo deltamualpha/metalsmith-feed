@@ -68,6 +68,27 @@ describe 'metalsmith-feed', ->
       assert.equal post.description[0], '<h1>Theory of Juice</h1><p>juice appeal</p>\n'
       done()
 
+  it 'adds custom post media', (done) ->
+    @site =
+      title: 'Geocities'
+      url: 'http://example.com'
+      author: 'Philodemus'
+
+    @metalsmith
+    .metadata {@site}
+    .use collections posts: '*.html'
+    .use feed
+      collection: 'posts'
+
+    @buildJson (rss) =>
+      assert.equal rss['$']['xmlns:atom'], 'http://www.w3.org/2005/Atom'
+
+      channel = rss['channel'][0]
+      post = channel.item[0]
+      assert.equal post['media:image'], 'http://example.com/foo.jpg'
+      assert.equal post['media:thumbnail'], 'http://example.com/foo.jpg'
+      done()
+
   it 'complains if metalsmith-colllections isnt setup', (done) ->
     @metalsmith
     .use feed collection: 'posts'
