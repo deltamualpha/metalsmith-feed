@@ -34,7 +34,7 @@ describe 'metalsmith-feed', ->
       channel = rss['channel'][0]
       assert.equal channel.title[0], @site.title
       assert.equal channel.author[0], @site.author
-      assert.equal channel.item.length, 1
+      assert.equal channel.item.length, 2
 
       post = channel.item[0]
       assert.equal post.title[0], 'Theory of Juice'
@@ -61,14 +61,14 @@ describe 'metalsmith-feed', ->
       channel = rss['channel'][0]
       assert.equal channel.title[0], @site.title
       assert.equal channel.author[0], @site.author
-      assert.equal channel.item.length, 1
+      assert.equal channel.item.length, 2
 
       post = channel.item[0]
       assert.equal post.title[0], 'Theory of Juice'
       assert.equal post.description[0], '<h1>Theory of Juice</h1><p>juice appeal</p>\n'
       done()
 
-  it 'adds custom post media', (done) ->
+  it 'adds custom post media if featuredImage', (done) ->
     @site =
       title: 'Geocities'
       url: 'http://example.com'
@@ -87,6 +87,10 @@ describe 'metalsmith-feed', ->
       post = channel.item[0]
       assert.equal post['media:image'], 'http://example.com/foo.jpg'
       assert.equal post['media:thumbnail'], 'http://example.com/foo.jpg'
+
+      post = channel.item[1]
+      assert.equal post['media:image'], undefined
+      assert.equal post['media:thumbnail'], undefined
       done()
 
   it 'complains if metalsmith-colllections isnt setup', (done) ->
