@@ -37,7 +37,22 @@ module.exports = (options={}) ->
       itemData = extend {}, file,
         description: postDescription(file)
       if file.featuredImage
-        itemData.custom_elements = [ { 'media:image': metadata.site?.url + file.featuredImage }, { 'media:thumbnail': metadata.site?.url + file.featuredImage } ]
+        itemData.custom_elements = [
+              'media:content': [{
+                  _attr: { 
+                    url: siteUrl + file.featuredImage, 
+                    medium: 'image' 
+                    } 
+              },
+              { 
+              'media:thumbnail': 
+                {
+                   _attr: {
+                    url: siteUrl + file.featuredImage
+                    }
+                }
+              }]
+          ]
       if not itemData.url and itemData.path
         itemData.url = url.resolve siteUrl, file.path
       feed.item itemData
