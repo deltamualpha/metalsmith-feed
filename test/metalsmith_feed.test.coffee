@@ -34,7 +34,7 @@ describe 'metalsmith-feed', ->
       channel = rss['channel'][0]
       assert.equal channel.title[0], @site.title
       assert.equal channel.author[0], @site.author
-      assert.equal channel.item.length, 2
+      assert.equal channel.item.length, 1
 
       post = channel.item[0]
       assert.equal post.title[0], 'Theory of Juice'
@@ -61,36 +61,45 @@ describe 'metalsmith-feed', ->
       channel = rss['channel'][0]
       assert.equal channel.title[0], @site.title
       assert.equal channel.author[0], @site.author
-      assert.equal channel.item.length, 2
+      assert.equal channel.item.length, 1
 
       post = channel.item[0]
       assert.equal post.title[0], 'Theory of Juice'
       assert.equal post.description[0], '<h1>Theory of Juice</h1><p>juice appeal</p>\n'
       done()
 
-  it 'adds custom post media if featuredImage', (done) ->
+  it 'adds custom elements to an item based on a function', (done) ->
     @site =
       title: 'Geocities'
       url: 'http://example.com'
       author: 'Philodemus'
 
+    @metalsmith = Metalsmith('test/fixtures/complex')
     @metalsmith
     .metadata {@site}
     .use collections posts: '*.html'
     .use feed
       collection: 'posts'
+      postCustomElements: (file) ->
+        if file.featuredImage
+          [
+            'media:image': [
+              _attr:
+                url: 'http://example.com' + file.featuredImage,
+                medium: 'image'
+            ]
+          ]
 
-    @buildJson (rss) =>
+    @buildJson (rss) ->
       assert.equal rss['$']['xmlns:atom'], 'http://www.w3.org/2005/Atom'
 
       channel = rss['channel'][0]
       post = channel.item[0]
-      assert.equal post['media:image'], 'http://example.com/foo.jpg'
-      assert.equal post['media:thumbnail'], 'http://example.com/foo.jpg'
+      assert.equal post['media:image'][0]['$']['url'], 'http://example.com/foo.jpg'
+      assert.equal post['media:image'][0]['$']['medium'], 'image'
 
       post = channel.item[1]
       assert.equal post['media:image'], undefined
-      assert.equal post['media:thumbnail'], undefined
       done()
 
   it 'complains if metalsmith-colllections isnt setup', (done) ->
